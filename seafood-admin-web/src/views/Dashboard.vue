@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard">
     <div class="header">
-      <h1>东软冷冻海产品溯源系统 · 系统管理端</h1>
+      <h1>冷冻海产品溯源系统 · 系统管理端</h1>
       <span class="admin">
         <el-icon><UserFilled /></el-icon> 管理员
         <el-button link type="danger" @click="logout">退出登录</el-button>

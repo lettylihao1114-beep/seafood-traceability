@@ -1,4 +1,4 @@
-# 东软冷冻海产品溯源系统（冷冻海产品 / Seafood Traceability）
+# 冷冻海产品溯源系统（冷冻海产品 / Seafood Traceability）
 
 > 信息管理系统综合实践项目 —— 前后端分离的全栈食品溯源系统。
 > 三端：**系统管理端**、**流通节点端**、**消费者端**。技术栈：Vue3 + ElementPlus + ECharts + Axios / SpringBoot + MyBatis-Plus + Spring Security + JWT / MySQL 8.0。

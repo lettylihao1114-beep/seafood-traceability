@@ -1,7 +1,7 @@
 <template>
   <div class="login-wrap">
     <el-card class="login-card">
-      <h2 class="title">东软冷冻海产品溯源系统</h2>
+      <h2 class="title">冷冻海产品溯源系统</h2>
       <p class="subtitle">流通节点端</p>
       <el-form :model="form" @keyup.enter="handleLogin">
         <el-form-item>

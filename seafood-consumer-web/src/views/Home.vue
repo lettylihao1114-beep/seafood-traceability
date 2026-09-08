@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class="hero">
-      <h1>东软冷冻海产品溯源系统</h1>
+      <h1>冷冻海产品溯源系统</h1>
       <p class="slogan">来源可查 · 去向可追 · 责任可究</p>
 
       <div class="query-box">

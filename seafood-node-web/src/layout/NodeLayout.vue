@@ -1,7 +1,7 @@
 <template>
   <div class="layout">
     <header class="topbar">
-      <div class="title">东软冷冻海产品溯源系统</div>
+      <div class="title">冷冻海产品溯源系统</div>
       <div class="company" v-if="auth.name">
         {{ auth.name }}
         <el-tag size="small" class="type-tag">{{ typeLabels[auth.type] || auth.type }}</el-tag>

@@ -15,7 +15,7 @@
     <artifactId>seafood-server</artifactId>
     <version>1.0.0</version>
     <name>seafood-server</name>
-    <description>东软冷冻海产品溯源系统后端</description>
+    <description>冷冻海产品溯源系统后端</description>
 
     <properties>
         <java.version>17</java.version>

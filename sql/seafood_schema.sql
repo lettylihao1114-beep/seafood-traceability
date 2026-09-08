@@ -1,5 +1,5 @@
 -- ============================================================
--- 东软冷冻海产品溯源系统 - 数据库结构
+-- 冷冻海产品溯源系统 - 数据库结构
 -- MySQL 8.0 / utf8mb4
 -- ============================================================
 CREATE DATABASE IF NOT EXISTS seafood_trace DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_general_ci;
