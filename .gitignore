@@ -1,0 +1,23 @@
+# ===== Node 前端 =====
+node_modules/
+dist/
+
+# ===== Maven 构建产物 =====
+target/
+
+# ===== 日志 =====
+*.log
+
+# ===== IDE =====
+.idea/
+.vscode/
+*.iml
+
+# ===== 操作系统垃圾 =====
+.DS_Store
+Thumbs.db
+
+# ===== 非项目源码：实训任务书 / Word 临时文件 =====
+*.doc
+*.docx
+~$*
