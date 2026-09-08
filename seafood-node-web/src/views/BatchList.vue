@@ -1,6 +1,9 @@
 <template>
   <div>
-    <h3 class="page-title">产品批号管理</h3>
+    <div class="bar">
+      <h3 class="page-title">产品批号管理</h3>
+      <el-button type="primary" plain @click="exportCsv">导出 CSV</el-button>
+    </div>
     <el-card>
       <el-tabs v-model="activeStatus" @tab-change="load">
         <el-tab-pane v-for="s in statuses" :key="s[0]" :label="s[1]" :name="String(s[0])" />
@@ -12,9 +15,10 @@
         <el-table-column prop="productType" label="产品类型" width="110" />
         <el-table-column prop="upstreamBatchNo" label="进场批号" width="130" />
         <el-table-column prop="enterpriseName" label="上游企业" />
-        <el-table-column label="状态" width="100">
+        <el-table-column label="状态" width="140">
           <template #default="{ row }">
             <el-tag :type="statusTag(row.status)">{{ statusLabel(row.status) }}</el-tag>
+            <el-tag v-if="isStale(row)" type="danger" effect="dark" size="small" style="margin-left:6px">预警</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="230" fixed="right">
@@ -75,9 +79,36 @@ async function onDelete(row) {
   await deleteBatch(row.id); ElMessage.success('已删除'); load()
 }
 
+function isStale(row) {
+  if (!row.createdAt) return false
+  const days = (Date.now() - new Date(row.createdAt).getTime()) / 86400000
+  if (days < 30) return false
+  // 停滞：养殖 待发布(0) / 其它 新建(0)；待确认超期：状态1
+  return row.status === 0 || row.status === 1
+}
+
+function exportCsv() {
+  const header = ['产品批号', '产品品种', '产品类型', '进场批号', '上游企业', '状态', '创建时间']
+  const lines = rows.value.map((r) => [
+    r.batchNo, r.productVariety, r.productType || '', r.upstreamBatchNo || '',
+    r.enterpriseName || '', statusLabel(r.status), r.createdAt || ''
+  ])
+  const csv = [header, ...lines]
+    .map((row) => row.map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(','))
+    .join('\n')
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = `批号台账_${new Date().toISOString().slice(0, 10)}.csv`
+  a.click()
+  URL.revokeObjectURL(a.href)
+  ElMessage.success('已导出当前列表')
+}
+
 onMounted(load)
 </script>
 
 <style scoped>
-.page-title { margin: 0 0 14px; }
+.bar { display: flex; align-items: center; justify-content: space-between; margin: 0 0 14px; }
+.page-title { margin: 0; }
 </style>

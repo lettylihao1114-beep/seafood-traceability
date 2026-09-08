@@ -7,6 +7,7 @@ import com.seafood.entity.City;
 import com.seafood.entity.NodeEnterprise;
 import com.seafood.entity.Province;
 import com.seafood.service.AdminService;
+import com.seafood.service.WarningService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,9 +25,11 @@ import java.util.List;
 public class AdminController {
 
     private final AdminService adminService;
+    private final WarningService warningService;
 
-    public AdminController(AdminService adminService) {
+    public AdminController(AdminService adminService, WarningService warningService) {
         this.adminService = adminService;
+        this.warningService = warningService;
     }
 
     // ---------- 节点企业 CRUD ----------
@@ -95,5 +98,11 @@ public class AdminController {
     @GetMapping("/stats/province-bar")
     public Result<List<StatItem>> provinceBar() {
         return Result.ok(adminService.provinceBar());
+    }
+
+    // ---------- 预警 ----------
+    @GetMapping("/stats/warnings")
+    public Result<java.util.Map<String, Object>> warnings() {
+        return Result.ok(warningService.summary());
     }
 }

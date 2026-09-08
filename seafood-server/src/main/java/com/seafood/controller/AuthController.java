@@ -6,6 +6,7 @@ import com.seafood.dto.LoginRequest;
 import com.seafood.dto.LoginResponse;
 import com.seafood.security.JwtUtil;
 import com.seafood.security.SecurityUser;
+import com.seafood.service.OperationLogService;
 import jakarta.validation.Valid;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,10 +21,13 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final OperationLogService operationLogService;
 
-    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+    public AuthController(AuthenticationManager authenticationManager, JwtUtil jwtUtil,
+                          OperationLogService operationLogService) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.operationLogService = operationLogService;
     }
 
     @PostMapping("/auth/login")
@@ -37,6 +41,8 @@ public class AuthController {
         }
         SecurityUser user = (SecurityUser) authentication.getPrincipal();
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole(), user.getType());
+        operationLogService.log(user.getUsername(), user.getRole(), user.getType(), "登录", user.getUsername(),
+                user.getType() == null ? "系统管理端" : user.getType());
         LoginResponse resp = new LoginResponse();
         resp.setToken(token);
         resp.setRole(user.getRole());

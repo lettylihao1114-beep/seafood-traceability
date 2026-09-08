@@ -14,6 +14,7 @@ DROP TABLE IF EXISTS node_enterprise;
 DROP TABLE IF EXISTS city;
 DROP TABLE IF EXISTS province;
 DROP TABLE IF EXISTS admin;
+DROP TABLE IF EXISTS operation_log;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ----------------------------
@@ -26,6 +27,22 @@ CREATE TABLE admin (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY uk_admin_code (login_code)
 ) ENGINE=InnoDB COMMENT='管理员信息';
+
+-- ----------------------------
+-- 操作日志（审计）
+-- ----------------------------
+CREATE TABLE operation_log (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_code VARCHAR(50) COMMENT '操作人登录编码',
+  role VARCHAR(50) COMMENT '角色',
+  node_type VARCHAR(20) COMMENT 'BREEDING/PROCESSING/WHOLESALE/RETAIL/ADMIN',
+  action VARCHAR(50) NOT NULL COMMENT '操作动作',
+  target VARCHAR(100) COMMENT '操作对象',
+  detail VARCHAR(200) COMMENT '操作详情',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  KEY idx_log_when (created_at),
+  KEY idx_log_action (action)
+) ENGINE=InnoDB COMMENT='操作日志';
 
 -- ----------------------------
 -- 省

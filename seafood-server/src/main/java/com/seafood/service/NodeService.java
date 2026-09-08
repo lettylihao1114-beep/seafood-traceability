@@ -33,6 +33,7 @@ public class NodeService {
     private final ProductBatchWholesaleMapper wholesaleMapper;
     private final ProductBatchRetailMapper retailMapper;
     private final PasswordEncoder passwordEncoder;
+    private final OperationLogService operationLogService;
 
     public NodeService(NodeEnterpriseMapper nodeEnterpriseMapper, ProvinceMapper provinceMapper,
                        CityMapper cityMapper,
@@ -40,7 +41,8 @@ public class NodeService {
                        ProductBatchProcessingMapper processingMapper,
                        ProductBatchWholesaleMapper wholesaleMapper,
                        ProductBatchRetailMapper retailMapper,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder,
+                       OperationLogService operationLogService) {
         this.nodeEnterpriseMapper = nodeEnterpriseMapper;
         this.provinceMapper = provinceMapper;
         this.cityMapper = cityMapper;
@@ -49,6 +51,7 @@ public class NodeService {
         this.wholesaleMapper = wholesaleMapper;
         this.retailMapper = retailMapper;
         this.passwordEncoder = passwordEncoder;
+        this.operationLogService = operationLogService;
     }
 
     // ==================== 我的 / 改密 ====================
@@ -273,6 +276,7 @@ public class NodeService {
         if (e.getStatus() != 0) throw new BizException("仅待发布状态可发布");
         e.setStatus(1);
         breedingMapper.updateById(e);
+        operationLogService.log("发布批号", e.getBatchNo(), e.getProductVariety());
     }
 
     @Transactional
@@ -283,16 +287,19 @@ public class NodeService {
             if (e.getStatus() != 0) throw new BizException("仅新建状态可发送确认请求");
             e.setStatus(1);
             processingMapper.updateById(e);
+            operationLogService.log("发送确认请求", e.getBatchNo(), e.getProductVariety());
         } else if (WHOLESALE.equals(type)) {
             ProductBatchWholesale e = require(wholesaleMapper.selectById(id), "批号不存在");
             if (e.getStatus() != 0) throw new BizException("仅新建状态可发送确认请求");
             e.setStatus(1);
             wholesaleMapper.updateById(e);
+            operationLogService.log("发送确认请求", e.getBatchNo(), e.getProductVariety());
         } else {
             ProductBatchRetail e = require(retailMapper.selectById(id), "批号不存在");
             if (e.getStatus() != 0) throw new BizException("仅新建状态可发送确认请求");
             e.setStatus(1);
             retailMapper.updateById(e);
+            operationLogService.log("发送确认请求", e.getBatchNo(), e.getProductVariety());
         }
     }
 
@@ -366,12 +373,14 @@ public class NodeService {
                 if (e.getStatus() != 1) throw new BizException("该批号不是待确认状态");
                 e.setStatus(2);
                 processingMapper.updateById(e);
+                operationLogService.log("确认下游批号", e.getBatchNo(), "加工" + e.getProductVariety());
             }
             case PROCESSING -> {
                 ProductBatchWholesale e = require(wholesaleMapper.selectById(batchId), "批号不存在");
                 if (e.getStatus() != 1) throw new BizException("该批号不是待确认状态");
                 e.setStatus(2);
                 wholesaleMapper.updateById(e);
+                operationLogService.log("确认下游批号", e.getBatchNo(), "批发" + e.getProductVariety());
             }
             case WHOLESALE -> {
                 ProductBatchRetail e = require(retailMapper.selectById(batchId), "批号不存在");
@@ -379,6 +388,8 @@ public class NodeService {
                 e.setStatus(2);
                 if (!StringUtils.hasText(e.getTraceCode())) e.setTraceCode(generateTraceCode());
                 retailMapper.updateById(e);
+                operationLogService.log("确认下游批号", e.getBatchNo(), "零售" + e.getProductVariety()
+                        + (e.getTraceCode() != null ? " 生成溯源码" + e.getTraceCode() : ""));
             }
             default -> throw new BizException("零售商无下游企业可确认");
         }

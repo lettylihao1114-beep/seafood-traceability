@@ -42,13 +42,16 @@ public class AdminService {
     private final ProvinceMapper provinceMapper;
     private final CityMapper cityMapper;
     private final PasswordEncoder passwordEncoder;
+    private final OperationLogService operationLogService;
 
     public AdminService(NodeEnterpriseMapper nodeEnterpriseMapper, ProvinceMapper provinceMapper,
-                        CityMapper cityMapper, PasswordEncoder passwordEncoder) {
+                        CityMapper cityMapper, PasswordEncoder passwordEncoder,
+                        OperationLogService operationLogService) {
         this.nodeEnterpriseMapper = nodeEnterpriseMapper;
         this.provinceMapper = provinceMapper;
         this.cityMapper = cityMapper;
         this.passwordEncoder = passwordEncoder;
+        this.operationLogService = operationLogService;
     }
 
     public PageResult<NodeEnterprise> pageEnterprise(long page, long size, String name, String type,
@@ -86,6 +89,7 @@ public class AdminService {
         entity.setPassword(passwordEncoder.encode(rawPwd));
         entity.setStatus(1);
         nodeEnterpriseMapper.insert(entity);
+        operationLogService.log("新增企业", entity.getLoginCode(), entity.getName());
     }
 
     @Transactional
@@ -96,11 +100,15 @@ public class AdminService {
         }
         entity.setPassword(null); // 密码更新由流通节点端自己完成
         nodeEnterpriseMapper.updateById(entity);
+        operationLogService.log("修改企业", entity.getLoginCode(), entity.getName());
     }
 
     @Transactional
     public void delete(Long id) {
+        NodeEnterprise ent = nodeEnterpriseMapper.selectById(id);
         nodeEnterpriseMapper.deleteById(id);
+        operationLogService.log("删除企业", ent == null ? String.valueOf(id) : ent.getLoginCode(),
+                ent == null ? null : ent.getName());
     }
 
     /** 近12个月注册数量趋势（含无人注册月份补0） */
